@@ -7,12 +7,16 @@ class EPackageGen implements IGenerator<EPackage> {
 	val classGen = new EClassifierGen()
 
 	override generate(EPackage element) {
-		return '''== «element.name»
+		return '''== EPackage «element.name»
 
-«EcoreUtil.getDocumentation(element)»
+«EcoreUtil.getDocumentation(element)?.toFirstLower»
 
 «FOR classifier : element.EClassifiers»
 «classGen.generate(classifier)»
+«ENDFOR»
+
+«FOR pakkage : element.ESubpackages»
+«generate(pakkage)»
 «ENDFOR»
 		'''
 	}

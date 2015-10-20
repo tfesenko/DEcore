@@ -1,27 +1,31 @@
 package com.tfesenko.decore.gen
 
-import com.tfesenko.decore.gen.IGenerator
-import org.eclipse.emf.ecore.EStructuralFeature
-import org.eclipse.emf.ecore.util.EcoreUtil
 import java.util.List
 import org.eclipse.emf.ecore.EAttribute
 import org.eclipse.emf.ecore.EReference
+import org.eclipse.emf.ecore.EStructuralFeature
+import static com.tfesenko.decore.gen.DocumentationGen.writeDocumentation
+import org.eclipse.emf.ecore.ETypedElement
 
 class EStructuralFeatureGen implements IGenerator<EStructuralFeature> {
-
+	
 	override generate(EStructuralFeature feature) {
-		'''«feature.eClass.name» «feature.name»: «type(feature)» «FOR qualifier : qualifiers(feature) BEFORE "(" SEPARATOR ", " AFTER ")"»«qualifier»«ENDFOR»::
-«EcoreUtil::getDocumentation(feature)»'''
+		'''«feature.eClass.name» «feature.name»: «type(feature)»«cardinality(feature)» «FOR qualifier : qualifiers(feature) BEFORE "(" SEPARATOR ", " AFTER ")"»«qualifier»«ENDFOR»«writeDocumentation(feature)»'''
 	}
 
-	dispatch def type(EReference feature) {
-		'''<<«EClassifierGen.anchor(feature.EType)»>>'''
+	def String type(ETypedElement feature) {
+		EClassifierGen::labelOrLinkTo(feature.EType)
 	}
-
-	dispatch def String type(EStructuralFeature feature) {
-		feature.EType.name
+	
+	def String cardinality(ETypedElement feature) {
+		if (feature.upperBound == feature.lowerBound) {
+			return '''[«feature.lowerBound»]'''
+		} else if (feature.upperBound == -1) {
+			return '''[«feature.lowerBound»..*]'''
+		}
+		return '''[«feature.lowerBound»..«feature.upperBound»]'''
 	}
-
+	
 	dispatch def List<String> qualifiers(EAttribute element) {
 		val List<String> result = commonQualifiers(element)
 		if (element.ID) {

@@ -6,7 +6,11 @@ import org.eclipse.emf.ecore.EClassifier
 import org.eclipse.emf.ecore.EDataType
 import org.eclipse.emf.ecore.EEnum
 import org.eclipse.emf.ecore.EEnumLiteral
+import org.eclipse.emf.ecore.ENamedElement
+import org.eclipse.emf.ecore.EOperation
 import org.eclipse.emf.ecore.util.EcoreUtil
+
+import static com.tfesenko.decore.gen.DocumentationGen.writeDocumentation
 
 class EClassifierGen implements IGenerator<EClassifier> {
 	val EStructuralFeatureGen featureGen = new EStructuralFeatureGen()
@@ -23,6 +27,15 @@ class EClassifierGen implements IGenerator<EClassifier> {
 
 	def static String anchor(EClassifier element) {
 		'''«element.EPackage?.name»-«element.name»'''
+	}
+
+	def static String labelOrLinkTo(EClassifier element) {
+		if(isEcoreType(element)) element.name else '''<<«anchor(element)»>>'''
+	}
+
+	def static isEcoreType(EClassifier element) {
+		// FIXME hack
+		return element.eContainer == null || (element.eContainer as ENamedElement).name.toLowerCase == "ecore"
 	}
 
 	dispatch def qualifiers(EDataType clazz) {
@@ -61,6 +74,9 @@ class EClassifierGen implements IGenerator<EClassifier> {
 «FOR feature : clazz.EStructuralFeatures»
 «featureGen.generate(feature)»
 «ENDFOR»
+«FOR operation : clazz.EOperations»
+«operation(operation)»
+«ENDFOR»
 '''
 	}
 
@@ -77,8 +93,12 @@ class EClassifierGen implements IGenerator<EClassifier> {
 	}
 
 	def enumLiteral(EEnumLiteral enumLiteral) {
-		'''«enumLiteral.eClass.name» «enumLiteral.name»(«enumLiteral.literal»)=«enumLiteral.value»::
-«EcoreUtil.getDocumentation(enumLiteral)»'''
+		'''«enumLiteral.eClass.name» «enumLiteral.name»(«enumLiteral.literal»)=«enumLiteral.value»«writeDocumentation(enumLiteral)»'''
+	}
+	
+	def operation(EOperation operation) {
+			val operationType = if (operation.EType != null) ''' «labelOrLinkTo(operation.EType)»''' else ""
+		'''«operation.eClass.name» «operation.name»(): «operationType»«featureGen.cardinality(operation)»«writeDocumentation(operation)»'''
 	}
 
 }
