@@ -6,6 +6,7 @@ import org.eclipse.emf.ecore.EReference
 import org.eclipse.emf.ecore.EStructuralFeature
 import static com.tfesenko.decore.gen.DocumentationGen.writeDocumentation
 import org.eclipse.emf.ecore.ETypedElement
+import com.tfesenko.decore.IGenerator
 
 class EStructuralFeatureGen implements IGenerator<EStructuralFeature> {
 	

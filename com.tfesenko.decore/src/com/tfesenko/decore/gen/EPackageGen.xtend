@@ -2,6 +2,7 @@ package com.tfesenko.decore.gen
 
 import org.eclipse.emf.ecore.EPackage
 import org.eclipse.emf.ecore.util.EcoreUtil
+import com.tfesenko.decore.IGenerator
 
 class EPackageGen implements IGenerator<EPackage> {
 	val classGen = new EClassifierGen()

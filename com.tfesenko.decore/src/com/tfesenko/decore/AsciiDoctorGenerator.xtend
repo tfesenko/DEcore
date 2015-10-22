@@ -17,6 +17,7 @@ import org.eclipse.emf.ecore.resource.ResourceSet
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl
 import org.eclipse.emf.ecore.util.EcoreUtil
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl
+import com.tfesenko.decore.plantuml.ClassDiagramGen
 
 class AsciiDoctorGenerator {
 	def static void main(String[] args) {
@@ -24,7 +25,7 @@ class AsciiDoctorGenerator {
 		//val resourceUrl = "file:/Users/TatianaFesenko/Documents/workspace/RepreZen/com.modelsolv.reprezen.restapi/metamodels/RestAPI.ecore"
 		var resource = loadResource(resourceUrl)
 		for (EPackage epackage : Iterables.filter(resource.getContents(), EPackage)) {
-			new AsciiDoctorGenerator().generate(epackage)
+			new AsciiDoctorGenerator().generatePlantUML(epackage)
 		}
 
 	}
@@ -41,6 +42,13 @@ Tatiana Fesenko <tatiana.fesenko@gmail.com>
 	'''
 		val outputDir = new File(".")
 		val outputFile = new File(outputDir, root.name + ".adoc");
+		Files.write(result, outputFile, Charsets::UTF_8);
+	}
+	
+	def void generatePlantUML(EPackage root) {
+		val result = new ClassDiagramGen().generate(root)
+		val outputDir = new File(".")
+		val outputFile = new File(outputDir, root.name + ".txt");
 		Files.write(result, outputFile, Charsets::UTF_8);
 	}
 

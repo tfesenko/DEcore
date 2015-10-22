@@ -11,6 +11,7 @@ import org.eclipse.emf.ecore.EOperation
 import org.eclipse.emf.ecore.util.EcoreUtil
 
 import static com.tfesenko.decore.gen.DocumentationGen.writeDocumentation
+import com.tfesenko.decore.IGenerator
 
 class EClassifierGen implements IGenerator<EClassifier> {
 	val EStructuralFeatureGen featureGen = new EStructuralFeatureGen()
