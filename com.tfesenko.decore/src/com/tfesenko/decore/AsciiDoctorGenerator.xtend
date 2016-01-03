@@ -19,15 +19,6 @@ import org.eclipse.emf.ecore.util.EcoreUtil
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl
 
 class AsciiDoctorGenerator implements IGenerator<EPackage> {
-	def static void main(
-		String[] args
-	) {
-		// val resourceUrl = "http://git.eclipse.org/c/uml2/org.eclipse.uml2.git/plain/plugins/org.eclipse.uml2.uml/model/UML.ecore"
-		val ecoreUrl = "http://git.eclipse.org/c/emf/org.eclipse.emf.git/plain/plugins/org.eclipse.emf.ecore/model/Ecore.ecore?id=f3630fa9f543c7ae944704ec53b42cd7d4fa505b"
-		val resourceUrl = "file:/Users/TatianaFesenko/Documents/workspace/RepreZen/com.modelsolv.reprezen.restapi/metamodels/RestAPI.ecore"
-		new AsciiDoctorGenerator().generate(resourceUrl)
-		print("Done")
-	}
 
 	def generate(String resourceUrl) {
 		var resource = loadResource(resourceUrl)
@@ -80,6 +71,7 @@ Tatiana Fesenko <tatiana.fesenko@gmail.com>
 		val outputDir = new File(".")
 		val outputFile = new File(outputDir, fileName + ".adoc");
 		Files.write(contents, outputFile, Charsets::UTF_8);
+		println("Generated to " + outputFile.absolutePath)
 	}
 
 }
