@@ -12,19 +12,24 @@ import org.eclipse.emf.ecore.EClass
 import org.eclipse.emf.ecore.EReference
 
 class ClassDiagramGen implements IGenerator<EClass> {
+	
+	val File imagesDir
+	
+	public new(File imagesDir) {
+		this.imagesDir = imagesDir
+		// TODO - delete dir?
+		imagesDir.mkdir();
+	}
 
 	override generate(EClass eclass) {
 		val url = '''[«IF eclass.interface»<<Interface>>«ENDIF»«eclass.name»{bg:cornsilk}],
 		«createOutgoingLinks(eclass)»'''
-		
-		// TODO - delete dir?
-		new File("images").mkdir()
-		val fileName = '''images/«eclass.name».png'''
-		saveImage(url, fileName)
-		return fileName
+		val imageFile = new File (imagesDir, '''«eclass.name».png''')
+		saveImage(url, imageFile)
+		return imageFile.canonicalPath
 	}
 
-	def protected saveImage(String imageUrl, String destinationFile) throws IOException {
+	def protected saveImage(String imageUrl, File destinationFile) throws IOException {
 		println(imageUrl)
 		val URL url = new URL(baseURL+URLEncoder::encode(imageUrl, "UTF-8"));
 		println(url)

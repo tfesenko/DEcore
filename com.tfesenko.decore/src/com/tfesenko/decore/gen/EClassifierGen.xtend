@@ -13,10 +13,11 @@ import com.tfesenko.decore.yuml.ClassDiagramGen
 
 import static com.tfesenko.decore.gen.DocumentationGen.writeDocumentation
 import com.tfesenko.decore.IGenerator
+import java.io.File
 
 class EClassifierGen implements IGenerator<EClassifier> {
-	val featureGen = new EStructuralFeatureGen()
-	val IGenerator<EClass> imageGenerator = new ClassDiagramGen()
+	val protected featureGen = new EStructuralFeatureGen()
+	val protected IGenerator<EClass> imageGenerator = new ClassDiagramGen(new File("images"))
 
 	override generate(EClassifier element) {
 		return '''[[«anchor(element)»,«element.name»]]

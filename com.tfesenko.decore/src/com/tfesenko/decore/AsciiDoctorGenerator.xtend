@@ -27,7 +27,6 @@ class AsciiDoctorGenerator implements IGenerator<EPackage> {
 		val resourceUrl = "file:/Users/TatianaFesenko/Documents/workspace/RepreZen/com.modelsolv.reprezen.restapi/metamodels/RestAPI.ecore"
 		new AsciiDoctorGenerator().generate(resourceUrl)
 		print("Done")
-
 	}
 
 	def generate(String resourceUrl) {
