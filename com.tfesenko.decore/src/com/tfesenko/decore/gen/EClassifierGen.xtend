@@ -9,12 +9,14 @@ import org.eclipse.emf.ecore.EEnumLiteral
 import org.eclipse.emf.ecore.ENamedElement
 import org.eclipse.emf.ecore.EOperation
 import org.eclipse.emf.ecore.util.EcoreUtil
+import com.tfesenko.decore.yuml.ClassDiagramGen
 
 import static com.tfesenko.decore.gen.DocumentationGen.writeDocumentation
 import com.tfesenko.decore.IGenerator
 
 class EClassifierGen implements IGenerator<EClassifier> {
-	val EStructuralFeatureGen featureGen = new EStructuralFeatureGen()
+	val  featureGen = new EStructuralFeatureGen()
+	val IGenerator<EClass> imageGenerator = new ClassDiagramGen()
 
 	override generate(EClassifier element) {
 		return '''[[«anchor(element)»,«element.name»]]
@@ -39,7 +41,7 @@ class EClassifierGen implements IGenerator<EClassifier> {
 		return element.eContainer == null || (element.eContainer as ENamedElement).name.toLowerCase == "ecore"
 	}
 
-	dispatch def qualifiers(EDataType clazz) {
+	dispatch def protected qualifiers(EDataType clazz) {
 		val List<String> result = newArrayList()
 		if (clazz.serializable) {
 			result.add("serializable")
@@ -47,7 +49,7 @@ class EClassifierGen implements IGenerator<EClassifier> {
 		return result
 	}
 
-	dispatch def qualifiers(EClass clazz) {
+	dispatch def protected qualifiers(EClass clazz) {
 		val List<String> result = newArrayList()
 		if (clazz.abstract) {
 			result.add("abstract")
@@ -58,20 +60,22 @@ class EClassifierGen implements IGenerator<EClassifier> {
 		return result
 	}
 
-	dispatch def List<String> qualifiers(EClassifier clazz) {
+	dispatch def protected List<String> qualifiers(EClassifier clazz) {
 		emptyList
 	}
 
-	dispatch def Iterable<String> supertypes(EClass clazz) {
-		clazz.ESuperTypes.map[anchor].map["<<"+it+">>"]
+	dispatch def protected Iterable<String> supertypes(EClass clazz) {
+		clazz.ESuperTypes.map[anchor].map["<<" + it + ">>"]
 	}
 
-	dispatch def Iterable<String> supertypes(EClassifier clazz) {
+	dispatch def protected Iterable<String> supertypes(EClassifier clazz) {
 		emptyList
 	}
 
 	dispatch def contents(EClass clazz) {
 		'''
+image::«imageGenerator.generate(clazz)»[«clazz.name»]
+
 «FOR feature : clazz.EStructuralFeatures»
 «featureGen.generate(feature)»
 «ENDFOR»
@@ -81,7 +85,7 @@ class EClassifierGen implements IGenerator<EClassifier> {
 '''
 	}
 
-	dispatch def contents(EEnum enumm) {
+	dispatch def protected contents(EEnum enumm) {
 		'''
 «FOR enumLiteral : enumm.ELiterals»
 	«enumLiteral(enumLiteral)»
@@ -89,16 +93,16 @@ class EClassifierGen implements IGenerator<EClassifier> {
 '''
 	}
 
-	dispatch def contents(EClassifier clazz) {
+	dispatch def protected contents(EClassifier clazz) {
 		""
 	}
 
-	def enumLiteral(EEnumLiteral enumLiteral) {
+	def protected enumLiteral(EEnumLiteral enumLiteral) {
 		'''«enumLiteral.eClass.name» «enumLiteral.name»(«enumLiteral.literal»)=«enumLiteral.value»«writeDocumentation(enumLiteral)»'''
 	}
-	
-	def operation(EOperation operation) {
-			val operationType = if (operation.EType != null) ''' «labelOrLinkTo(operation.EType)»''' else ""
+
+	def protected operation(EOperation operation) {
+		val operationType = if (operation.EType != null) ''' «labelOrLinkTo(operation.EType)»''' else ""
 		'''«operation.eClass.name» «operation.name»(): «operationType»«featureGen.cardinality(operation)»«writeDocumentation(operation)»'''
 	}
 
