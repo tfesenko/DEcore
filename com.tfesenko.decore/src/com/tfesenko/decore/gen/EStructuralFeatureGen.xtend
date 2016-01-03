@@ -11,7 +11,7 @@ import com.tfesenko.decore.IGenerator
 class EStructuralFeatureGen implements IGenerator<EStructuralFeature> {
 	
 	override generate(EStructuralFeature feature) {
-		'''«feature.eClass.name» «feature.name»: «type(feature)»«cardinality(feature)» «FOR qualifier : qualifiers(feature) BEFORE "(" SEPARATOR ", " AFTER ")"»«qualifier»«ENDFOR»«writeDocumentation(feature)»'''
+		'''«feature.eClass.name» *«feature.name»*: «type(feature)»«cardinality(feature)» «FOR qualifier : qualifiers(feature) BEFORE "(" SEPARATOR ", " AFTER ")"»«qualifier»«ENDFOR»«writeDocumentation(feature)»'''
 	}
 
 	def String type(ETypedElement feature) {
@@ -22,7 +22,7 @@ class EStructuralFeatureGen implements IGenerator<EStructuralFeature> {
 		if (feature.upperBound == feature.lowerBound) {
 			return '''[«feature.lowerBound»]'''
 		} else if (feature.upperBound == -1) {
-			return '''[«feature.lowerBound»..*]'''
+			return '''[«feature.lowerBound»..{asterisk}]'''
 		}
 		return '''[«feature.lowerBound»..«feature.upperBound»]'''
 	}

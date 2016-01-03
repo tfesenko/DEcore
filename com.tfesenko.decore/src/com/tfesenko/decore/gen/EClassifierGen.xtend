@@ -15,14 +15,13 @@ import static com.tfesenko.decore.gen.DocumentationGen.writeDocumentation
 import com.tfesenko.decore.IGenerator
 
 class EClassifierGen implements IGenerator<EClassifier> {
-	val  featureGen = new EStructuralFeatureGen()
+	val featureGen = new EStructuralFeatureGen()
 	val IGenerator<EClass> imageGenerator = new ClassDiagramGen()
 
 	override generate(EClassifier element) {
 		return '''[[«anchor(element)»,«element.name»]]
-=== «element.eClass.name» «element.name» «FOR qualifier : qualifiers(element) BEFORE "(" SEPARATOR ", " AFTER ")"»«qualifier»«ENDFOR» «FOR qualifier : supertypes(element) BEFORE "->" SEPARATOR ", "»«qualifier»«ENDFOR»
-«EcoreUtil.getDocumentation(element)»
-
+«heading(element)»
+«documentation(element)»
 «contents(element)»
 
 		'''
@@ -39,6 +38,18 @@ class EClassifierGen implements IGenerator<EClassifier> {
 	def static isEcoreType(EClassifier element) {
 		// FIXME hack
 		return element.eContainer == null || (element.eContainer as ENamedElement).name.toLowerCase == "ecore"
+	}
+
+	def protected heading(EClassifier element) {
+		'''=== «element.eClass.name» [big]*«element.name»* '''+
+		'''«FOR qualifier : qualifiers(element) BEFORE "(" SEPARATOR ", " AFTER ")"»«qualifier»«ENDFOR» '''+
+		'''«FOR supertype : supertypes(element) BEFORE "->" SEPARATOR ", "»«supertype»«ENDFOR»'''
+	}
+
+	def protected documentation(EClassifier element) {
+		'''++++
+«EcoreUtil.getDocumentation(element)»
+++++'''
 	}
 
 	dispatch def protected qualifiers(EDataType clazz) {
@@ -103,7 +114,7 @@ image::«imageGenerator.generate(clazz)»[«clazz.name»]
 
 	def protected operation(EOperation operation) {
 		val operationType = if (operation.EType != null) ''' «labelOrLinkTo(operation.EType)»''' else ""
-		'''«operation.eClass.name» «operation.name»(): «operationType»«featureGen.cardinality(operation)»«writeDocumentation(operation)»'''
+		'''«operation.eClass.name» *«operation.name»()*: «operationType»«featureGen.cardinality(operation)»«writeDocumentation(operation)»'''
 	}
 
 }

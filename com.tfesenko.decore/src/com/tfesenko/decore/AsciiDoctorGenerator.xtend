@@ -4,7 +4,6 @@ import com.google.common.base.Charsets
 import com.google.common.collect.Iterables
 import com.google.common.io.Files
 import com.tfesenko.decore.gen.EPackageGen
-import com.tfesenko.decore.yuml.ClassDiagramGen
 import java.io.File
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -19,21 +18,33 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl
 import org.eclipse.emf.ecore.util.EcoreUtil
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl
 
-class AsciiDoctorGenerator {
-	def static void main(String[] args) {
-		//val resourceUrl = "http://git.eclipse.org/c/uml2/org.eclipse.uml2.git/plain/plugins/org.eclipse.uml2.uml/model/UML.ecore"
+class AsciiDoctorGenerator implements IGenerator<EPackage> {
+	def static void main(
+		String[] args
+	) {
+		// val resourceUrl = "http://git.eclipse.org/c/uml2/org.eclipse.uml2.git/plain/plugins/org.eclipse.uml2.uml/model/UML.ecore"
 		val ecoreUrl = "http://git.eclipse.org/c/emf/org.eclipse.emf.git/plain/plugins/org.eclipse.emf.ecore/model/Ecore.ecore?id=f3630fa9f543c7ae944704ec53b42cd7d4fa505b"
 		val resourceUrl = "file:/Users/TatianaFesenko/Documents/workspace/RepreZen/com.modelsolv.reprezen.restapi/metamodels/RestAPI.ecore"
-		var resource = loadResource(resourceUrl)
-		for (EPackage epackage : Iterables.filter(resource.getContents(), EPackage)) {
-			new AsciiDoctorGenerator().generate(epackage)
-		}
+		new AsciiDoctorGenerator().generate(resourceUrl)
 		print("Done")
 
 	}
 
-	def void generate(EPackage root) {
-		val result = '''= «root.name»
+	def generate(String resourceUrl) {
+		var resource = loadResource(resourceUrl)
+		generate(resource)
+	}
+
+	def generate(Resource resource) {
+		for (EPackage epackage : Iterables.filter(resource.getContents(), EPackage)) {
+			val contents = new AsciiDoctorGenerator().generate(epackage)
+			saveToFile(epackage.name, contents)
+		}
+	}
+
+	override generate(EPackage root) {
+
+		'''= Metamodel [big]*«root.name»*
 Tatiana Fesenko <tatiana.fesenko@gmail.com>
 «currentDate»
 :toc:
@@ -42,9 +53,6 @@ Tatiana Fesenko <tatiana.fesenko@gmail.com>
 
 «new EPackageGen().generate(root)»	
 	'''
-		val outputDir = new File(".")
-		val outputFile = new File(outputDir, root.name + ".adoc");
-		Files.write(result, outputFile, Charsets::UTF_8);
 	}
 
 	def static loadResource(String resourceUrl) {
@@ -63,10 +71,16 @@ Tatiana Fesenko <tatiana.fesenko@gmail.com>
 		resource
 	}
 
-	def currentDate() {
+	def protected currentDate() {
 		val DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy");
 		val Date date = new Date();
 		return dateFormat.format(date);
+	}
+
+	def static protected saveToFile(String fileName, String contents) {
+		val outputDir = new File(".")
+		val outputFile = new File(outputDir, fileName + ".adoc");
+		Files.write(contents, outputFile, Charsets::UTF_8);
 	}
 
 }

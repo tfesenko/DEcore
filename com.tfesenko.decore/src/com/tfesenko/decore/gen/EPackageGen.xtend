@@ -8,7 +8,7 @@ class EPackageGen implements IGenerator<EPackage> {
 	val classGen = new EClassifierGen()
 
 	override generate(EPackage element) {
-		return '''== EPackage «element.name»
+		return '''== EPackage [big]*«element.name»*
 
 «EcoreUtil.getDocumentation(element)?.toFirstLower»
 
